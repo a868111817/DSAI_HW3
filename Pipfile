@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 pandas = "==1.2.0"
+matplotlib = "*"
 
 [dev-packages]
 

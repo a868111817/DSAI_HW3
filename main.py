@@ -1,5 +1,6 @@
 
-# You should not modify this part.
+import pandas as pd
+
 def config():
     import argparse
 
@@ -13,8 +14,6 @@ def config():
 
 
 def output(path, data):
-    import pandas as pd
-
     df = pd.DataFrame(data, columns=["time", "action", "target_price", "target_volume"])
     df.to_csv(path, index=False)
 
