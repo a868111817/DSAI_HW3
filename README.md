@@ -8,7 +8,7 @@
 ### Execute
 
 ```
-pyhton main.py
+python main.py
 ```
 
 
