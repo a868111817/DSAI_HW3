@@ -5,6 +5,13 @@
   - [Slide](https://docs.google.com/presentation/d/1JW27_5HXYZhqWmgvDhtXBaFTOfksO_dS/edit#slide=id.p1)
   - [Dashboard](https://docs.google.com/spreadsheets/d/1cjhQewnXT2IbmYkGXRYNC5PlGRafcbVprCjgSFyDAaU/edit?pli=1#gid=0)
 
+### Execute
+
+```
+pyhton main.py
+```
+
+
 ### Rules
 
 - SFTP
