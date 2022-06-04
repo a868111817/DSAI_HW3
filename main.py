@@ -1,5 +1,31 @@
 
 import pandas as pd
+from keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
+import utils
+import pickle
+import datetime
+
+def strategy(gen_predict,con_predict,df):
+    action = 'no action' # -1 -> sell ,0 -> no action ,1 -> buy
+    volume = 0.0
+    price = 0.0
+
+    if (gen_predict > con_predict):
+        action = 'buy'
+        volume = gen_predict - con_predict
+        price = 2.6
+    elif (gen_predict == con_predict):
+        action = 'no action'
+    else:
+        action = 'sell'
+        volume = con_predict - gen_predict
+        price = 2.4
+
+    tomorrow = df['time'].iloc[6] + datetime.timedelta(days=1)
+    data = [[tomorrow,action,price,volume]]
+
+    return data
 
 def config():
     import argparse
@@ -23,6 +49,41 @@ def output(path, data):
 if __name__ == "__main__":
     args = config()
 
-    data = [["2018-01-01 00:00:00", "buy", 2.5, 3],
-            ["2018-01-01 01:00:00", "sell", 3, 5]]
+    # load generation.csv
+    gen = pd.read_csv(args.generation)
+
+    # load consumption.csv
+    con = pd.read_csv(args.consumption)
+
+    # transfer column-time to datetime type
+    gen['time'] = pd.to_datetime(gen['time'], format="%Y-%m-%d %H:%M:%S")
+    con['time'] = pd.to_datetime(con['time'], format="%Y-%m-%d %H:%M:%S")
+
+    # merge two dataframe
+    df = pd.merge(gen,con)
+
+    # transfer testing data from hours to days
+    df = utils.day_generation(df,7)
+
+    # load model
+    model = load_model('rnn_model.h5')
+    # save scale
+    scalerfile = 'sc.sav'
+    sc = pickle.load(open(scalerfile, 'rb'))
+
+    # transfer testing datatype
+    gen_test, con_test = utils.iterator_test(df,sc)
+
+    # predict generation
+    prediction = model.predict(gen_test)
+    prediction = sc.inverse_transform(prediction)
+    gen_predict = float(prediction)
+
+    # predict consumption
+    prediction = model.predict(con_test)
+    prediction = sc.inverse_transform(prediction)
+    con_predict = float(prediction)
+
+    data = strategy(gen_predict,con_predict,df)
+
     output(args.output, data)
